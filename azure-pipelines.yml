@@ -1,0 +1,75 @@
+# Pipeline Otimizado para Alta Performance (Versão com npm install)
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  npm_config_cache: $(Pipeline.Workspace)/.npm
+
+steps:
+# 1. Define a versão do Node.js
+- task: UseNode@1
+  inputs:
+    version: '18.x'
+  displayName: 'Instalar Node.js'
+
+# 2. Cache de Dependências (NPM) - Configuração flexível baseada no package.json
+- task: Cache@2
+  inputs:
+    key: 'npm | "$(Agent.OS)" | Backend/package.json | Frontend/package.json'
+    restoreKeys: |
+      npm | "$(Agent.OS)"
+    path: $(npm_config_cache)
+  displayName: 'Garantir Cache do NPM'
+
+# --- PIPELINE DO BACKEND ---
+# Voltamos para o install tradicional para aceitar repositórios sem package-lock.json
+- script: npm install
+  workingDirectory: '$(Build.SourcesDirectory)/Backend'
+  displayName: 'Backend: Instalar dependências'
+
+- script: npm run build --if-present
+  workingDirectory: '$(Build.SourcesDirectory)/Backend'
+  displayName: 'Backend: Compilar o projeto'
+
+- script: npm test --if-present
+  workingDirectory: '$(Build.SourcesDirectory)/Backend'
+  displayName: 'Backend: Executar testes'
+
+# --- PIPELINE DO FRONTEND ---
+- script: npm install --legacy-peer-deps
+  workingDirectory: '$(Build.SourcesDirectory)/Frontend'
+  displayName: 'Frontend: Instalar dependências'
+
+- script: npm run build --if-present
+  workingDirectory: '$(Build.SourcesDirectory)/Frontend'
+  displayName: 'Frontend: Compilar o projeto'
+
+- script: npm test --if-present -- --watchAll=false --passWithNoTests --coverage --coverageReporters="cobertura" --collectCoverageFrom="src/**/*.{js,jsx,ts,tsx}" --collectCoverageFrom="!src/**/*.d.ts"
+  env:
+    CI: 'true'
+  workingDirectory: '$(Build.SourcesDirectory)/Frontend'
+  displayName: 'Frontend: Executar testes'
+
+# --- PUBLICAR COBERTURA DE CÓDIGO ---
+- task: PublishCodeCoverageResults@2
+  inputs:
+    summaryFileLocation: '$(Build.SourcesDirectory)/Frontend/coverage/cobertura-coverage.xml'
+  displayName: 'Publicar Relatório de Cobertura de Código'
+
+# --- SALVAR ARTEFATOS PARA DEPLOY ---
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.SourcesDirectory)/Frontend/build'
+    ArtifactName: 'frontend-drop'
+    publishLocation: 'Container'
+  displayName: 'Publicar Artefato: Frontend'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.SourcesDirectory)/Backend'
+    ArtifactName: 'backend-drop'
+    publishLocation: 'Container'
+  displayName: 'Publicar Artefato: Backend'
