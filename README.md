@@ -69,6 +69,7 @@ ou
 node index.js
 ```
 
+- Medotos da API 
 ```bash
 	Metodo: POST /paciente
 	Metodo: PUT /paciente
