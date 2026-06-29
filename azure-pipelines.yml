@@ -25,7 +25,6 @@ steps:
   displayName: 'Garantir Cache do NPM'
 
 # --- PIPELINE DO BACKEND ---
-# Voltamos para o install tradicional para aceitar repositórios sem package-lock.json
 - script: npm install
   workingDirectory: '$(Build.SourcesDirectory)/Backend'
   displayName: 'Backend: Instalar dependências'
@@ -58,6 +57,7 @@ steps:
   inputs:
     summaryFileLocation: '$(Build.SourcesDirectory)/Frontend/coverage/cobertura-coverage.xml'
   displayName: 'Publicar Relatório de Cobertura de Código'
+  condition: always()
 
 # --- SALVAR ARTEFATOS PARA DEPLOY ---
 - task: PublishBuildArtifacts@1
