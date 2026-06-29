@@ -68,3 +68,15 @@ nodemon index.js
 ou 
 node index.js
 ```
+
+```bash
+	Metodo: POST /paciente
+	Metodo: PUT /paciente
+	Metodo: DELETE /paciente/1
+	Metodo: GET /paciente/likeNome?nome="Pessoa 1"
+	Metodo: POST /sessao
+	Metodo: PUT /sessao
+	Metodo: DELETE /sessao/1
+	Metodo: GET /sessao/1
+	Metodo: GET /sessao
+```
