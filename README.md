@@ -1,4 +1,4 @@
-## 🌐 React-Massoterapia-Api-Node-mvp 
+## 🌐 React-Massoterapia-Api-Node
 Aplicativo de agendamento de sessões de massoterapia em React 18 e Node.js com banco de dados Postgree. 
 
 #### 🎨 Aqui está uma demonstração do Projeto
