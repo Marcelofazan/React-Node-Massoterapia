@@ -1,4 +1,4 @@
-## 🌐 React-Massoterapia-Api-Node
+## 🌐 React-Node-Massoterapia
 Exemplo de projeto de Massoterapeuta em React 18 e API Node.js com banco de dados Postgres. 
 
 #### 🎨 Aqui está uma demonstração do Projeto
